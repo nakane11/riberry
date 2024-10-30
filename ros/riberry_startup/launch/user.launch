@@ -1,8 +1,19 @@
 <launch>
 
-  <arg name="namespace" default="robot_a" />
+  <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
+    <arg name="urdf_path" value="$(find hand_v3_model)/urdf/hand_v3_model_dae.urdf" />
+    <arg name="servo_config_path" value="$(find hand_v3_model)/config/hand_v3_servo_config.yaml" />
+    <arg name="publish_imu" value="false" />
+    <arg name="control_pressure" value="true" />
+  </include>
 
-  <group ns="$(arg namespace)" >
-  </group>
+  <node name="pressure_control_mode"
+        pkg="riberry_startup" type="pressure_control_mode.py"
+        output="screen">
+  </node>
 
+  <node name="teaching_mode"
+        pkg="riberry_startup" type="teaching_mode.py"
+        output="screen">
+  </node>
 </launch>
