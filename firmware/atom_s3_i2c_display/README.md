@@ -62,6 +62,7 @@ The `atom_s3_i2c_display` includes multiple modes. This feature allows the robot
 | servo_control_mode.cpp | servo_control_mode.py |
 | pressure_control_mode.cpp | pressure_control_mode.py |
 | teaching_mode.cpp | teaching_mode.py |
+| display_battery_graph_mode.cpp | display_battery_graph_mode.py |
 
 - `i2c_button_state_publisher.cpp` facilitates communication between these programs.
 The following sections provide details on the base code for the AtomS3 firmware.
@@ -110,3 +111,7 @@ The following sections provide details on the base code for the AtomS3 firmware.
   - Playing motion automatically starts at the moment of transition from `WAIT` state to `PLAY` state
   - A double click stops playing motion.
   - After playback, the state automatically returns to `WAIT`.
+
+- Display Battery Graph Mode
+
+  Displays the remaining battery charge as a percentage, with a graph of the change over time underneath.
