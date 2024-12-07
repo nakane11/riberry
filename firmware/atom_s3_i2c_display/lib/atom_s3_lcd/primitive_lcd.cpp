@@ -1,8 +1,9 @@
 #include <primitive_lcd.h>
 
-PrimitiveLCD::PrimitiveLCD() : LGFX() {
-  lcdMutex = xSemaphoreCreateMutex();
+// PrimitiveLCD::PrimitiveLCD() : LGFX() {
+PrimitiveLCD::PrimitiveLCD() {
   init();
+  lcdMutex = xSemaphoreCreateMutex();
 }
 
 void PrimitiveLCD::drawJpg(const uint8_t *jpg_data, size_t jpg_len, uint16_t x, uint16_t y, uint16_t maxWidth, uint16_t maxHeight, uint16_t offX, uint16_t offY, jpeg_div_t scale) {
@@ -91,8 +92,10 @@ void PrimitiveLCD::setCursor(int x, int y){
 };
 
 void PrimitiveLCD::setRotation(int lcd_rotation){
+  println("setrotation");
   if (lockLcd()) {
     setRotation(lcd_rotation);
+    println("finish");
     unlockLcd();
   }
 }
@@ -143,10 +146,11 @@ uint16_t PrimitiveLCD::colorMap(int code, bool isBackground) {
   
 bool PrimitiveLCD::lockLcd() {
   // ミューテックスのロックを試みる（最大100ms待機）
-  return xSemaphoreTake(lcdMutex, pdMS_TO_TICKS(100)) == pdTRUE;
+  // return xSemaphoreTake(lcdMutex, pdMS_TO_TICKS(100)) == pdTRUE;
+  return true;
 }
 
 void PrimitiveLCD::unlockLcd() {
   // ミューテックスを解放
-  xSemaphoreGive(lcdMutex);
+  // xSemaphoreGive(lcdMutex);
 }
