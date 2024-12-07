@@ -117,6 +117,7 @@ private:
 #else
   static constexpr int lcd_rotation = 1; /**< Current rotation of the LCD. */
 #endif
+  SemaphoreHandle_t lcdMutex;
   unsigned long lastDrawTime = 0;
   /**
    * @brief Convert ANSI color codes to RGB565 values for foreground or background.
@@ -126,6 +127,8 @@ private:
    * @return The RGB565 color value.
    */
   uint16_t colorMap(int code, bool isBackground = false);
+  bool lockLcd();
+  void unlockLcd();
 };
 
 #endif // ATOM_S3_LCD_H
