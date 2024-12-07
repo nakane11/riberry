@@ -1,7 +1,7 @@
 #include <atom_s3_lcd.h>
 
 AtomS3LCD::AtomS3LCD()
-  : lcd(), qrCodeData("") {
+  : lcd(), qrCodeData(""), lcdMutex(xSemaphoreCreateMutex()) {
   init();
 }
 
@@ -16,8 +16,21 @@ void AtomS3LCD::clear() {
     lcd.clear();
 }
 
+bool AtomS3LCD::lockLcd() {
+    // ミューテックスのロックを試みる（最大100ms待機）
+    return xSemaphoreTake(lcdMutex, pdMS_TO_TICKS(100)) == pdTRUE;
+}
+
+void AtomS3LCD::unlockLcd() {
+    // ミューテックスを解放
+    xSemaphoreGive(lcdMutex);
+}
+
 void AtomS3LCD::printMessage(const String& message) {
+  if (lockLcd()) {
     lcd.println(message);
+    unlockLcd();
+  }
 }
 
 uint16_t AtomS3LCD::colorMap(int code, bool isBackground) {
@@ -51,30 +64,32 @@ uint16_t AtomS3LCD::colorMap(int code, bool isBackground) {
 }
 
 void AtomS3LCD::printColorText(const String& input) {
-    String text = input;
-    uint16_t textColor = lcd.color565(255, 255, 255); // Default text color: white
-    uint16_t bgColor = lcd.color565(0, 0, 0);         // Default background color: black
-    int index = 0;
-
+  String text = input;
+  uint16_t textColor = lcd.color565(255, 255, 255); // Default text color: white
+  uint16_t bgColor = lcd.color565(0, 0, 0);         // Default background color: black
+  int index = 0;
+  if (lockLcd()) {
     while (index < text.length()) {
-        if (text.charAt(index) == '\x1b' && text.charAt(index + 1) == '[') {
-            int mIndex = text.indexOf('m', index);
-            if (mIndex != -1) {
-                String seq = text.substring(index + 2, mIndex);
-                int code = seq.toInt();
-                if (seq.startsWith("4")) {
-                    bgColor = colorMap(code, true);
-                } else if (seq.startsWith("3")) {
-                    textColor = colorMap(code, false);
-                }
-                text.remove(index, mIndex - index + 1);
-                continue;
-            }
+      if (text.charAt(index) == '\x1b' && text.charAt(index + 1) == '[') {
+        int mIndex = text.indexOf('m', index);
+        if (mIndex != -1) {
+          String seq = text.substring(index + 2, mIndex);
+          int code = seq.toInt();
+          if (seq.startsWith("4")) {
+            bgColor = colorMap(code, true);
+          } else if (seq.startsWith("3")) {
+            textColor = colorMap(code, false);
+          }
+          text.remove(index, mIndex - index + 1);
+          continue;
         }
-        lcd.setTextColor(textColor, bgColor);
-        lcd.print(text.charAt(index));
-        index++;
+      }
+      lcd.setTextColor(textColor, bgColor);
+      lcd.print(text.charAt(index));
+      index++;
     }
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::printWaitMessage(int i2cAddress) {
@@ -91,10 +106,14 @@ void AtomS3LCD::printWaitMessage(int i2cAddress) {
 
 // e.g. atoms3lcd.drawImage(atoms3lcd.jpegBuf, atoms3lcd.jpegLength);
 void AtomS3LCD::drawImage(uint8_t* jpegBuf, uint32_t jpegLength) {
+  if (lockLcd()) {
     lcd.drawJpg(jpegBuf, jpegLength, 0, 0, 128, 128, 0, 0, ::JPEG_DIV_NONE);
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::drawQRcode(const String& qrCodeData) {
+  if (lockLcd()) {
     if (qrCodeData.length() > 0) {
       // Draw QR code if qrCodeData is received
       lcd.fillScreen(lcd.color565(255, 255, 255));
@@ -105,17 +124,25 @@ void AtomS3LCD::drawQRcode(const String& qrCodeData) {
       lcd.setCursor(0, 0);
       lcd.println("No QR code data received.");
     }
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::drawNoDataReceived() {
-  lcd.fillScreen(lcd.color565(255, 0, 0));  // Fill the screen with red
-  lcd.setCursor(0, 0);
-  lcd.println("No data received.");
+  if (lockLcd()) {
+    lcd.fillScreen(lcd.color565(255, 0, 0));  // Fill the screen with red
+    lcd.setCursor(0, 0);
+    lcd.println("No data received.");
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::drawBlack() {
-  lcd.fillScreen(lcd.color565(0, 0, 0));  // Fill the screen with black
-  lcd.setCursor(0, 0);
+  if (lockLcd()) {
+    lcd.fillScreen(lcd.color565(0, 0, 0));  // Fill the screen with black
+    lcd.setCursor(0, 0);
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::resetColorStr() {
@@ -138,27 +165,45 @@ void AtomS3LCD::resetLcdData() {
 }
 
 void AtomS3LCD::setTextSize(float x) {
-  lcd.setTextSize(x);
+  if (lockLcd()) {
+    lcd.setTextSize(x);
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::fillRect(int x1, int y1, int w, int h, uint16_t color) {
-  lcd.fillRect(x1, y1, w, h, color);
+  if (lockLcd()) {
+    lcd.fillRect(x1, y1, w, h, color);
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::drawRect(int x1, int y1, int w, int h, uint16_t color) {
-  lcd.drawRect(x1, y1, w, h, color);
+  if (lockLcd()) {
+    lcd.drawRect(x1, y1, w, h, color);
+    unlockLcd();
+  }
 }
 
 void AtomS3LCD::drawLine(int x1, int y1, int x2, int y2, uint16_t color){
-  lcd.drawLine(x1, y1, x2, y2, color);
+  if (lockLcd()) {
+    lcd.drawLine(x1, y1, x2, y2, color);
+    unlockLcd();
+  }
 };
 
 void AtomS3LCD::drawPixel(int x, int y, uint16_t color){
-  lcd.drawPixel(x, y, color);
+  if (lockLcd()) {
+    lcd.drawPixel(x, y, color);
+    unlockLcd();
+  }
 };
 
 void AtomS3LCD::setCursor(int x, int y){
-  lcd.setCursor(x,y);
+  if (lockLcd()) {
+    lcd.setCursor(x,y);
+    unlockLcd();
+  }
 };
 
 uint16_t AtomS3LCD::color565(uint8_t red, uint8_t green, uint8_t blue){
