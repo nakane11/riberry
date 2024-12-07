@@ -38,13 +38,6 @@ public:
   void printWaitMessage(int i2cAddress);
 
   /**
-   * @brief Print a message to the LCD screen.
-   *
-   * @param message The message to be printed.
-   */
-  void printMessage(const String& message);
-
-  /**
    * @brief Print colored text using ANSI-style escape sequences.
    *
    * @param input The input string containing ANSI escape codes.
@@ -81,6 +74,7 @@ public:
   void resetQRcodeData();
   void resetLcdData();
   void setTextSize(float x);
+  void fillScreen(uint16_t color);
   void fillRect(int x1, int y1, int x2, int y2, uint16_t color);
   void drawRect(int x1, int y1, int x2, int y2, uint16_t color);
   void drawLine(int x1, int y1, int x2, int y2, uint16_t color);
