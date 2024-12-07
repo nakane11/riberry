@@ -19,11 +19,6 @@ public:
   AtomS3LCD();
 
   /**
-   * @brief Initialize the LCD screen and set default properties.
-   */
-  void init();
-
-  /**
    * @brief Draw a JPEG image on the LCD screen.
    *
    * @param jpegBuf A buffer containing the JPEG image data.

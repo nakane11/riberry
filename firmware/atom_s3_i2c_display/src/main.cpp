@@ -35,6 +35,9 @@ const std::vector<Mode*> allModes =
 AtomS3ModeManager atoms3modemanager(atoms3lcd, atoms3button, atoms3i2c, allModes);
 
 void setup() {
+  atoms3lcd.init();
+  atoms3lcd.drawBlack();
+  atoms3lcd.printColorText("hello");
   atoms3button.createTask(0);
   atoms3i2c.createTask(0);
   atoms3modemanager.createTask(0);

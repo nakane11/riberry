@@ -25,7 +25,7 @@ void PrimitiveLCD::printColorText(const String& input) {
   uint16_t bgColor = color565(0, 0, 0);         // Default background color: black
   int index = 0;
   if (lockLcd()) {
-  while (index < text.length()) {
+    while (index < text.length()) {
       if (text.charAt(index) == '\x1b' && text.charAt(index + 1) == '[') {
         int mIndex = text.indexOf('m', index);
         if (mIndex != -1) {

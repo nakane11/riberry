@@ -1,11 +1,7 @@
 #include <atom_s3_lcd.h>
 
 AtomS3LCD::AtomS3LCD()
-  : qrCodeData("") {
-  init();
-}
-
-void AtomS3LCD::init() {
+  : qrCodeData(""), PrimitiveLCD() {
   setRotation(lcd_rotation);
   clear();
   setTextSize(1.5);
