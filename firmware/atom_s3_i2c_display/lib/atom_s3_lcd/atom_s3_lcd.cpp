@@ -26,13 +26,6 @@ void AtomS3LCD::unlockLcd() {
     xSemaphoreGive(lcdMutex);
 }
 
-void AtomS3LCD::printMessage(const String& message) {
-  if (lockLcd()) {
-    lcd.println(message);
-    unlockLcd();
-  }
-}
-
 uint16_t AtomS3LCD::colorMap(int code, bool isBackground) {
     if (isBackground) {
         switch (code) {
@@ -93,7 +86,7 @@ void AtomS3LCD::printColorText(const String& input) {
 }
 
 void AtomS3LCD::printWaitMessage(int i2cAddress) {
-    printMessage("Wait for I2C input.");
+    printColorText("Wait for I2C input.\n");
 #ifdef USE_GROVE
     printColorText("\x1b[31mGROVE\x1b[39m Mode\n");
 #else
@@ -129,20 +122,14 @@ void AtomS3LCD::drawQRcode(const String& qrCodeData) {
 }
 
 void AtomS3LCD::drawNoDataReceived() {
-  if (lockLcd()) {
-    lcd.fillScreen(lcd.color565(255, 0, 0));  // Fill the screen with red
-    lcd.setCursor(0, 0);
-    lcd.println("No data received.");
-    unlockLcd();
-  }
+  fillScreen(lcd.color565(255, 0, 0));  // Fill the screen with red
+  setCursor(0, 0);
+  printColorText("No data received.\n");
 }
 
 void AtomS3LCD::drawBlack() {
-  if (lockLcd()) {
-    lcd.fillScreen(lcd.color565(0, 0, 0));  // Fill the screen with black
-    lcd.setCursor(0, 0);
-    unlockLcd();
-  }
+  fillScreen(lcd.color565(0, 0, 0));  // Fill the screen with black
+  setCursor(0, 0);
 }
 
 void AtomS3LCD::resetColorStr() {
@@ -167,6 +154,13 @@ void AtomS3LCD::resetLcdData() {
 void AtomS3LCD::setTextSize(float x) {
   if (lockLcd()) {
     lcd.setTextSize(x);
+    unlockLcd();
+  }
+}
+
+void AtomS3LCD::fillScreen(uint16_t color) {
+  if (lockLcd()) {
+    lcd.fillScreen(color);
     unlockLcd();
   }
 }
