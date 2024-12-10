@@ -12,8 +12,9 @@
       mode_names:
       - DisplayInformationMode <!-- Enabled by display_information.service -->
       - DisplayQRcodeMode <!-- Enabled by display_information.service -->
-      - DisplayImageMode <!-- Enabled by display_information.service -->
+      <!-- - DisplayImageMode <!-\- Enabled by display_information.service -\-> -->
       - DisplayBatteryGraphMode
+      - HandControlMode
       - ServoControlMode
       - PressureControlMode
       - TeachingMode

@@ -88,6 +88,10 @@ void AtomS3I2C::receiveEvent(int howMany) {
             instance->atoms3lcd.color_str = str.substring(1); // remove PacketType Header
             break;
 
+        case HAND_CONTROL_MODE:
+            instance->atoms3lcd.color_str = str.substring(1); // remove PacketType Header
+            break;
+
         case SERVO_CONTROL_MODE:
             instance->atoms3lcd.color_str = str.substring(1); // remove PacketType Header
             break;

@@ -5,4 +5,15 @@
   <group ns="$(arg namespace)" >
   </group>
 
+ <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
+    <arg name="urdf_path" value="$(find hand_v3_model)/urdf/hand_v3_model_dae.urdf" />
+    <arg name="servo_config_path" value="$(find hand_v3_model)/config/hand_v3_servo_config.yaml" />
+    <arg name="publish_imu" value="false" />
+    <arg name="control_pressure" value="true" />
+  </include>
+
+  <include file="$(find riberry_startup)/launch/all_modes.launch" />
+
+  <include file="$(find hand_v3)/launch/hand.launch" />
 </launch>
+
