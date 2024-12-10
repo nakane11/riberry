@@ -29,7 +29,7 @@ void DisplayBatteryGraphMode::task(void *parameter) {
         int numParts = instance->atoms3i2c.splitString(instance->atoms3lcd.color_str,
                                                        ',', parts, max_buffer_length + 3);
 
-        uint8 new_charge_status = 0;
+        uint new_charge_status = 0;
         if (numParts > 0)
           new_charge_status = atoi(parts[0]);
 
@@ -69,7 +69,7 @@ void DisplayBatteryGraphMode::createTask(uint8_t xCoreID) {
 }
 
 void DisplayBatteryGraphMode::updateGraph(float* buffer, int buffer_length,
-                                          uint8 new_charge_status, String current, int duration) {
+                                          uint new_charge_status, String current, int duration) {
   int gap = 1; // width between bar to bar
   int buffer_w = (graph_w - (buffer_length - 1) * gap) / buffer_length;
 
