@@ -12,7 +12,7 @@
       mode_names:
       - DisplayInformationMode <!-- Enabled by display_information.service -->
       - DisplayQRcodeMode <!-- Enabled by display_information.service -->
-      - DisplayImageMode <!-- Enabled by display_information.service -->
+      <!-- - DisplayImageMode <!-\- Enabled by display_information.service -\-> -->
       - DisplayBatteryGraphMode
       - ServoControlMode
       - PressureControlMode
@@ -41,7 +41,14 @@
   <node name="teaching_mode"
         pkg="riberry_startup" type="teaching_mode.py"
         output="screen"
+	clear_params="true"
         respawn="true">
+    <rosparam>
+      special_actions:
+      - name: "grasp_spoon"
+        start_command: "ri.send_pose('spoon');"
+        stop_command: "ri.send_pose('free_hand');"
+    </rosparam>
   </node>
 
 </launch>
