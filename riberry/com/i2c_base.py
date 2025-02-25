@@ -93,7 +93,9 @@ class I2CBase(ComBase):
     def write(self, data):
         print(877777)
         print(type(data))
-        buffer_size = len(data) + 8
+        print(len(data))
+        # ASCIIだけでなくUnicode（4バイト文字）を表示できるようにしている
+        buffer_size = len(data) * 4
         packer = WirePacker(buffer_size=buffer_size)
 
         if isinstance(data, str):
@@ -155,6 +157,14 @@ class I2CBase(ComBase):
             raise TypeError(f'Unsupported data type: {type(data)}. Expected str or bytes.')
 
         packer.end()
+
+        print(packer.buffer)
+        print(len(packer.buffer))
+        print(44444)
+        print(packer.buffer[: packer.available()])
+        print(len(packer.buffer[: packer.available()]))
+        print(55555)
+        
         if packer.available():
             self.i2c_write(packer.buffer[: packer.available()])
 
