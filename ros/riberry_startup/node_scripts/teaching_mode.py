@@ -380,7 +380,7 @@ class TeachingMode(I2CBase):
     def handle_change_motion_name_state(self, msg: Int32) -> State:
         if self.new_motion_name is None:
             input_string = rospy.wait_for_message('~motion_name', String, timeout=None)
-            self.new_motion_name = input_string.data.encode("utf-8")
+            self.new_motion_name = input_string.data
         if msg.data == 1:
             # retry input
             self.new_motion_name = None

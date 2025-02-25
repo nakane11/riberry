@@ -15,8 +15,14 @@ if sys.hexversion < 0x03000000:
 else:
 
     def _b(x):
-        return x.encode("latin-1")
+        return x.encode(check_string_type(x))
 
+def check_string_type(text):
+    try:
+        text.encode('latin-1')
+        return 'latin-1'
+    except UnicodeEncodeError:
+        return 'utf-8'    
 
 class I2C:
 
