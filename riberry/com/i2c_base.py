@@ -15,8 +15,15 @@ if sys.hexversion < 0x03000000:
 else:
 
     def _b(x):
-        return x.encode("latin-1")
+        # return x.encode(check_string_type(x))
+        return x.encode('latin-1')
 
+def check_string_type(text):
+    try:
+        text.encode('latin-1')
+        return 'latin-1'
+    except UnicodeEncodeError:
+        return 'utf-8'
 
 class I2C:
 
@@ -84,15 +91,31 @@ class I2CBase(ComBase):
                 print(e)
 
     def write(self, data):
-        buffer_size = len(data) + 8
+        print(877777)
+        print(type(data))
+        print(len(data))
+        # ASCIIだけでなくUnicode（4バイト文字）を表示できるようにしている
+        buffer_size = len(data) * 4
         packer = WirePacker(buffer_size=buffer_size)
 
         if isinstance(data, str):
+            print("hello")
+            print(data)
             for s in data:
                 try:
-                    packer.write(ord(s))
+                    print(333)
+                    print(s)
+                    if check_string_type(s) != 'utf-8':
+                        print(11111111)
+                        packer.write(ord(s))
+                    else:
+                        print(2222222)
+                        packer.write(s)
                 except ValueError as e:
                     print(f'[ERROR] {e} Invalid character {s}')
+                except:
+                    print(9999999)
+                    
         elif isinstance(data, (bytes, bytearray)):
             for r in data:
                 packer.write(r)
@@ -104,7 +127,29 @@ class I2CBase(ComBase):
             elif all(isinstance(item, str) and len(item) == 1 for item in data):
                 # If all elements are single-character strings, convert to ASCII values
                 data_str = ''.join(data)  # Combine list into a single string
-                for r in list(map(ord, data_str)):
+                # print(data_str)
+                print(66666666)
+                # for r in list(lambda x: x.encode('utf-8'), data_str):
+                #     print(r)
+                #     packer.write(r)
+                # # print(data_str)
+                nested_byte_list = list(map(lambda x: list(x.encode('utf-8')), data_str))
+                # result = []
+                # for sublist in nested_byte_list:
+                #     current_length = len(sublist)
+                #     padded = [0] * 4
+                #     for i in range(current_length):
+                #         padded[4 - current_length + i] = sublist[i]
+                #     # for i in range(current_length):
+                #     #     padded[i] = sublist[i]
+                #     result.append(padded)
+                # print(result)
+                # byte_list = [item for sublist in result for item in sublist]
+                byte_list = [item for sublist in nested_byte_list for item in sublist]
+                # byte_list += [0]
+                print(byte_list)
+                print(len(byte_list))
+                for r in byte_list:
                     packer.write(r)
             else:
                 raise ValueError('List must contain either all integers or all single-character strings.')
@@ -112,6 +157,14 @@ class I2CBase(ComBase):
             raise TypeError(f'Unsupported data type: {type(data)}. Expected str or bytes.')
 
         packer.end()
+
+        print(packer.buffer)
+        print(len(packer.buffer))
+        print(44444)
+        print(packer.buffer[: packer.available()])
+        print(len(packer.buffer[: packer.available()]))
+        print(55555)
+        
         if packer.available():
             self.i2c_write(packer.buffer[: packer.available()])
 
