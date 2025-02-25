@@ -6,6 +6,7 @@ PrimitiveLCD::PrimitiveLCD() : LGFX(), qrCodeData("") {
     setRotation(lcd_rotation);
     clear();
     setTextSize(DEFAULT_TEXT_SIZE);
+    setFont(&fonts::lgfxJapanGothic_12);
 }
 
 void PrimitiveLCD::drawJpg(const uint8_t* jpg_data,
@@ -36,11 +37,20 @@ void PrimitiveLCD::printColorText(const String& input) {
     uint16_t textColor = LGFX::color565(255, 255, 255);  // Default text color: white
     uint16_t bgColor = LGFX::color565(0, 0, 0);          // Default background color: black
     int index = 0;
+    int lastPrintPos = 0;  // 最後に出力した文字列の位置
+
     if (lockLcd()) {
         while (index < text.length()) {
             if (text.charAt(index) == '\x1b' && text.charAt(index + 1) == '[') {
                 int mIndex = text.indexOf('m', index);
                 if (mIndex != -1) {
+                    // **色変更の前に、これまでの文字列を出力**
+                    if (lastPrintPos < index) {
+                        LGFX::setTextColor(textColor, bgColor);
+                        LGFX::print(text.substring(lastPrintPos, index));
+                    }
+
+                    // **エスケープシーケンス処理**
                     String seq = text.substring(index + 2, mIndex);
                     int code = seq.toInt();
                     if (seq.startsWith("4")) {
@@ -48,14 +58,22 @@ void PrimitiveLCD::printColorText(const String& input) {
                     } else if (seq.startsWith("3")) {
                         textColor = colorMap(code, false);
                     }
+
+                    // **シーケンスをスキップして次の文字へ**
                     text.remove(index, mIndex - index + 1);
+                    lastPrintPos = index;  // 出力位置を更新
                     continue;
                 }
             }
-            LGFX::setTextColor(textColor, bgColor);
-            LGFX::print(text.charAt(index));
             index++;
         }
+
+        // **最後に残った文字列を出力**
+        if (lastPrintPos < text.length()) {
+            LGFX::setTextColor(textColor, bgColor);
+            LGFX::print(text.substring(lastPrintPos));
+        }
+        LGFX::print("あああ");
         unlockLcd();
     }
 }
