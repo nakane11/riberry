@@ -6,6 +6,8 @@ PrimitiveLCD::PrimitiveLCD() : LGFX(), qrCodeData("") {
     setRotation(lcd_rotation);
     clear();
     setTextSize(DEFAULT_TEXT_SIZE);
+    // setFont(&fonts::lgfxJapanGothic_8);
+    setFont(&fonts::lgfxJapanMinchoP_8);
 }
 
 void PrimitiveLCD::drawJpg(const uint8_t* jpg_data,
@@ -31,13 +33,43 @@ void PrimitiveLCD::qrcode(
     }
 }
 
+// UTF-8 のバイト数を数える関数
+int utf8_length(const String& str) {
+    int byteCount = 0;
+    for (int i = 0; i < str.length(); i++) {
+        char c = str.charAt(i);
+        if ((c & 0x80) == 0x00) {        // 1バイト (ASCII)
+            byteCount += 1;
+        } else if ((c & 0xE0) == 0xC0) { // 2バイト
+            byteCount += 2;
+        } else if ((c & 0xF0) == 0xE0) { // 3バイト
+            byteCount += 3;
+        } else if ((c & 0xF8) == 0xF0) { // 4バイト
+            byteCount += 4;
+        }
+    }
+    return byteCount;
+}
+
 void PrimitiveLCD::printColorText(const String& input) {
-    String text = input;
+    LGFX::print(String(input.length()));
+  
+    String text;
+    text.reserve(300);
+    text = input;
+    // LGFX::print(text.length());   
     uint16_t textColor = LGFX::color565(255, 255, 255);  // Default text color: white
     uint16_t bgColor = LGFX::color565(0, 0, 0);          // Default background color: black
     int index = 0;
     if (lockLcd()) {
+        // LGFX::print(text);
+
+        LGFX::print(String(text.length()));
+        // LGFX::print(String(utf8_length(text)));
+        // LGFX::print(strlen(text.c_str()));
+
         while (index < text.length()) {
+        // while (index < utf8_length(text)) {
             if (text.charAt(index) == '\x1b' && text.charAt(index + 1) == '[') {
                 int mIndex = text.indexOf('m', index);
                 if (mIndex != -1) {
@@ -53,8 +85,29 @@ void PrimitiveLCD::printColorText(const String& input) {
                 }
             }
             LGFX::setTextColor(textColor, bgColor);
-            LGFX::print(text.charAt(index));
-            index++;
+            // LGFX::print(text.charAt(index));
+            // index++;
+            uint8_t firstByte = text.charAt(index);
+            int charLen;
+            if ((firstByte & 0x80) == 0) {          // 0xxxxxxx - ASCII
+              charLen = 1;
+            } else if ((firstByte & 0xE0) == 0xC0) { // 110xxxxx - 2 byte charactor
+              charLen = 2;
+            } else if ((firstByte & 0xF0) == 0xE0) { // 1110xxxx - 3 byte charactor
+              charLen = 3;
+            } else if ((firstByte & 0xF8) == 0xF0) { // 11110xxx - 4 byte charactor
+              charLen = 4;
+            } else {
+              // 無効なUTF-8バイト
+              charLen = 1;
+            }
+            LGFX::print(text.substring(index, index+charLen));
+            // LGFX::print(text.charAt(index));
+            // if (charLen > 1) {
+            //     LGFX::print(String(charLen));
+            // }
+            index += charLen;
+            // index ++;
         }
         unlockLcd();
     }
