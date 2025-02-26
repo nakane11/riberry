@@ -37,6 +37,11 @@ add_message_files(
   KeywordCandidates.msg
 )
 
+add_service_files(
+   FILES
+   SelectMotion.srv
+ )
+
 generate_messages(
   DEPENDENCIES
   std_msgs
