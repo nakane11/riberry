@@ -106,6 +106,8 @@ class TeachingMode(Mode):
         self.new_motion_name = None
         self.speed = rospy.get_param('~speed', 1.0)
         self.load_play_list()
+        self.state_list = SelectList(items=["record", "play", "free", "repeat play"])
+        self.repeat = False
 
         # ROS callbacks
         self.prev_state = State.WAIT
@@ -301,18 +303,27 @@ class TeachingMode(Mode):
 
     def handle_wait_state(self, msg: Int32) -> State:
         if msg.data == 1:
-            # Select special action if ~special_actions param is defined
-            if len(self.special_actions) > 0 and\
-               self.special_action_selected is None:
-                return State.SPECIAL_ACTION_SELECT
-            else:
-                self.start_recording()
-                return State.RECORD
-        elif msg.data == 2:
-            return State.PLAY_LIST_SELECT
-        elif msg.data == 3:
-            self.teaching_manager.servo_off()
+            self.state_list.increment_index()
             return State.WAIT
+        elif msg.data == 2:
+            selected_state = self.state_list.selected_option()
+            if selected_state == "record":
+                # Select special action if ~special_actions param is defined
+                if len(self.special_actions) > 0 and\
+                   self.special_action_selected is None:
+                    return State.SPECIAL_ACTION_SELECT
+                else:
+                    self.start_recording()
+                    return State.RECORD
+            elif selected_state == "play":
+                self.repeat = False
+                return State.PLAY_LIST_SELECT
+            elif selected_state == "free":
+                self.teaching_manager.servo_off()
+                return State.WAIT
+            elif selected_state == "repeat play":
+                self.repeat = True
+                return State.PLAY_LIST_SELECT
         elif msg.data == 4:
             return State.MOTION_LIST_SELECT
         else:  # If no valid button press, do not change state
@@ -467,12 +478,12 @@ class TeachingMode(Mode):
         if self.state != State.WAIT:
             self.additional_str = ""
         if self.state == State.WAIT:
-            sent_str += 'Teaching mode\n\n'\
-                + '1tap: record\n'\
-                + '2tap: play\n'\
-                + '3tap: free'
+            sent_str += 'Teaching mode\n'\
+                + ' 1tap: next\n'\
+                + ' 2tap: select\n'
+            sent_str += self.state_list.string_options(4)
             if self.additional_str != "":
-                sent_str += "\n\n" + self.additional_str
+                sent_str += "\n" + self.additional_str
         elif self.state == State.SPECIAL_ACTION_SELECT:
             sent_str += 'Special action\n\n'
             sent_str += ' 1tap: next\n' + ' 2tap: select\n\n'
@@ -507,6 +518,7 @@ class TeachingMode(Mode):
                 + f'{self.play_list.selected_option(True)}\n\n'\
                 + '2tap:\n stop playing'
             sent_str += f'\n\nSpeed x{self.speed}'
+            sent_str += f'\nRepeat: {self.repeat}'
         elif self.state == State.MOTION_LIST_SELECT:
             sent_str += "Motion file\n"
             if len(self.play_list.options) <= 0:
@@ -559,7 +571,7 @@ class TeachingMode(Mode):
         def play_task():
             self.playing = True
             result_message = self.teaching_manager.play(
-                play_file, self.speed)
+                play_file, self.speed, repeat=self.repeat)
             self.additional_str = result_message
             # Automatically stop after play
             self.stop_playing()
