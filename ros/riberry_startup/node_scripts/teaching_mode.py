@@ -3,6 +3,7 @@
 from datetime import datetime
 from enum import Enum
 import os
+import re
 import threading
 
 from riberry_startup.srv import SelectMotion
@@ -51,6 +52,23 @@ def get_json_path(json_dir, filename=None):
         json_path = os.path.join(
             json_dir, f'teaching_{filename}.json')
     return json_path
+
+
+def format_words(text, max_length):
+    text = text.replace("\n", " ")
+    words = text.split()
+    lines, current_line = [], ""
+    for word in words:
+        new_line = current_line + (" " if current_line else "") + word
+        plain_new_line = re.sub(r'\x1b\[[0-9;]*m', '', new_line)
+        if len(plain_new_line) + (1 if current_line else 0) <= max_length:
+            current_line = new_line
+        else:
+            lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+    return '\n'.join(lines)
 
 
 class State(Enum):
@@ -106,7 +124,7 @@ class TeachingMode(Mode):
         self.new_motion_name = None
         self.speed = rospy.get_param('~speed', 1.0)
         self.load_play_list()
-        self.state_list = SelectList(items=["record", "play", "free", "repeat play"])
+        self.state_list = SelectList(items=["record", "play", "free", "repeat"])
         self.repeat = False
 
         # ROS callbacks
@@ -321,7 +339,7 @@ class TeachingMode(Mode):
             elif selected_state == "free":
                 self.teaching_manager.servo_off()
                 return State.WAIT
-            elif selected_state == "repeat play":
+            elif selected_state == "repeat":
                 self.repeat = True
                 return State.PLAY_LIST_SELECT
         elif msg.data == 4:
@@ -481,9 +499,9 @@ class TeachingMode(Mode):
             sent_str += 'Teaching mode\n'\
                 + ' 1tap: next\n'\
                 + ' 2tap: select\n'
-            sent_str += self.state_list.string_options(4)
+            sent_str += format_words(self.state_list.string_options(4), 14)
             if self.additional_str != "":
-                sent_str += "\n" + self.additional_str
+                sent_str += "\n\n" + self.additional_str
         elif self.state == State.SPECIAL_ACTION_SELECT:
             sent_str += 'Special action\n\n'
             sent_str += ' 1tap: next\n' + ' 2tap: select\n\n'
