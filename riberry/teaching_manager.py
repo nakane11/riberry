@@ -129,8 +129,6 @@ class TeachingManager:
             if len(self.marker_manager.get_markers()) == 0:
                 ret = self.motion_manager.play_motion(
                     recorded_motion, special_actions, speed)
-                if not repeat:
-                    return ret
             else:
                 # The entire movement is performed again after the initial posture
                 # to compensate for deflection of the arm due to gravity
@@ -168,6 +166,5 @@ class TeachingManager:
                 else:
                     ret = self.motion_manager.play_motion(
                         moved_motion, special_actions, speed)
-                if not repeat:
-                    return ret
-        return ret
+            if not repeat or self.motion_manager.is_stopped():
+                return ret
