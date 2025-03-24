@@ -102,7 +102,7 @@ class TeachingManager:
             f"{len(self.marker_manager.get_markers())} markers"
         return message
 
-    def play(self, play_filepath, speed=1.0):
+    def play(self, play_filepath, speed=1.0, repeat=False):
         """Plays back recorded motion
 
         Args:
@@ -124,43 +124,50 @@ class TeachingManager:
         rospy.loginfo('Play motion')
         recorded_motion = self.motion_manager.get_motion()
         special_actions = self.motion_manager.get_actions()
-        if len(self.marker_manager.get_markers()) == 0:
-            return self.motion_manager.play_motion(
-                recorded_motion, special_actions, speed)
-        else:
-            # The entire movement is performed again after the initial posture
-            # to compensate for deflection of the arm due to gravity
-            # with visual feedback.
-            # self.play_motion_with_marker([self.motion_manager.get_motion()[0]])
-            # # Wait for new marker topic to come after previous motion stopped
-            # rospy.sleep(0.5)
-
-            # ID check
-            if not self.marker_manager.is_marker_recognized():
-                error_message = "Marker must be visible at the beginning of the motion"
-                rospy.logerr(error_message)
-                return error_message
-            first_marker = self.marker_manager.get_markers()[0]
-            if first_marker["marker_id"] != self.marker_manager.current_marker_ids()[0]:
-                error_message = "Current marker ID != recorded marker ID."
-                rospy.logerr(error_message)
-                return error_message
-            # Marker coords calculation
-            # TODO: Use marker at anytime
-            first_marker_coords = self.marker_manager.first_marker_coords()
-            current_marker_average_coords = self.marker_manager.current_marker_coords(average_num=5)
-            rospy.loginfo(f"first_marker_coords: {first_marker_coords}")
-            rospy.loginfo(
-                f"current_marker_average_coords: {current_marker_average_coords}")
-            # After recognizing marker, servo on
-            self.servo_on()
-            # Move motion trajectory
-            moved_motion, message = self.motion_manager.move_motion(
-                recorded_motion, current_marker_average_coords, first_marker_coords)
-            rospy.loginfo("Note that if you record marker with servo_off" +\
-                          " you should start playing with servo_off")
-            if moved_motion is False:
-                return message
+        ret = False
+        while True:
+            if len(self.marker_manager.get_markers()) == 0:
+                ret = self.motion_manager.play_motion(
+                    recorded_motion, special_actions, speed)
+                if not repeat:
+                    return ret
             else:
-                return self.motion_manager.play_motion(
-                    moved_motion, special_actions, speed)
+                # The entire movement is performed again after the initial posture
+                # to compensate for deflection of the arm due to gravity
+                # with visual feedback.
+                # self.play_motion_with_marker([self.motion_manager.get_motion()[0]])
+                # # Wait for new marker topic to come after previous motion stopped
+                # rospy.sleep(0.5)
+
+                # ID check
+                if not self.marker_manager.is_marker_recognized():
+                    error_message = "Marker must be visible at the beginning of the motion"
+                    rospy.logerr(error_message)
+                    return error_message
+                first_marker = self.marker_manager.get_markers()[0]
+                if first_marker["marker_id"] != self.marker_manager.current_marker_ids()[0]:
+                    error_message = "Current marker ID != recorded marker ID."
+                    rospy.logerr(error_message)
+                    return error_message
+                # Marker coords calculation
+                # TODO: Use marker at anytime
+                first_marker_coords = self.marker_manager.first_marker_coords()
+                current_marker_average_coords = self.marker_manager.current_marker_coords(average_num=5)
+                rospy.loginfo(f"first_marker_coords: {first_marker_coords}")
+                rospy.loginfo(
+                    f"current_marker_average_coords: {current_marker_average_coords}")
+                # After recognizing marker, servo on
+                self.servo_on()
+                # Move motion trajectory
+                moved_motion, message = self.motion_manager.move_motion(
+                    recorded_motion, current_marker_average_coords, first_marker_coords)
+                rospy.loginfo("Note that if you record marker with servo_off" +\
+                              " you should start playing with servo_off")
+                if moved_motion is False:
+                    ret = message
+                else:
+                    ret = self.motion_manager.play_motion(
+                        moved_motion, special_actions, speed)
+                if not repeat:
+                    return ret
+        return ret
