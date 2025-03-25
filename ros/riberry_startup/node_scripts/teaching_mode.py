@@ -125,7 +125,7 @@ class TeachingMode(Mode):
         self.speed = rospy.get_param('~speed', 1.0)
         self.load_play_list()
         self.state_list = SelectList(items=["record", "play", "free", "repeat"])
-        self.repeat = False
+        self.repeat = 1
 
         # ROS callbacks
         self.prev_state = State.WAIT
@@ -334,13 +334,13 @@ class TeachingMode(Mode):
                     self.start_recording()
                     return State.RECORD
             elif selected_state == "play":
-                self.repeat = False
+                self.repeat = 1
                 return State.PLAY_LIST_SELECT
             elif selected_state == "free":
                 self.teaching_manager.servo_off()
                 return State.WAIT
             elif selected_state == "repeat":
-                self.repeat = True
+                self.repeat = -1
                 return State.PLAY_LIST_SELECT
         elif msg.data == 4:
             return State.MOTION_LIST_SELECT
@@ -536,7 +536,7 @@ class TeachingMode(Mode):
                 + f'{self.play_list.selected_option(True)}\n\n'\
                 + '2tap:\n stop playing'
             sent_str += f'\n\nSpeed x{self.speed}'
-            sent_str += f'\nRepeat: {self.repeat}'
+            sent_str += f'\nRepeat: {"inf" if self.repeat == -1 else self.repeat}'
         elif self.state == State.MOTION_LIST_SELECT:
             sent_str += "Motion file\n"
             if len(self.play_list.options) <= 0:

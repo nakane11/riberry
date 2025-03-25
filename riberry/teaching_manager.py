@@ -102,7 +102,7 @@ class TeachingManager:
             f"{len(self.marker_manager.get_markers())} markers"
         return message
 
-    def play(self, play_filepath, speed=1.0, repeat=False):
+    def play(self, play_filepath, speed=1.0, repeat=1):
         """Plays back recorded motion
 
         Args:
@@ -124,8 +124,8 @@ class TeachingManager:
         rospy.loginfo('Play motion')
         recorded_motion = self.motion_manager.get_motion()
         special_actions = self.motion_manager.get_actions()
-        ret = False
-        while True:
+        count = 0
+        while repeat == -1 or count < repeat:
             if len(self.marker_manager.get_markers()) == 0:
                 ret = self.motion_manager.play_motion(
                     recorded_motion, special_actions, speed)
@@ -168,3 +168,4 @@ class TeachingManager:
                         moved_motion, special_actions, speed)
             if not repeat or self.motion_manager.is_stopped():
                 return ret
+            count += 1
