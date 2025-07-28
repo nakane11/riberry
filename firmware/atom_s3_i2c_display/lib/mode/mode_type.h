@@ -17,7 +17,7 @@ enum Name : uint8_t {
     PAIRING = 0x11,
     WIFI_SETTINGS = 0x12,
     DATA_COLLECTION = 0x13,
-
+    HAND_CONTROL = 0x14,
     FIRMWARE_UPDATE = 0xFF,
 };
 
@@ -53,6 +53,8 @@ inline String toString(Name name) {
             return "DataCollectionMode";
         case FIRMWARE_UPDATE:
             return "FirmwareUpdateMode";
+        case HAND_CONTROL:
+            return "HandControlMode";            
         default:
             return "Unknown";
     }
