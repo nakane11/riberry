@@ -57,7 +57,7 @@ class I2CBase(ComBase):
         if self.device_type == "Raspberry Pi":
             self.i2c = I2C(self.i2c_addr, bus=1)
         elif self.device_type == "Radxa Zero":
-            self.i2c = I2C(self.i2c_addr, bus=1)
+            self.i2c = I2C(self.i2c_addr, bus=3)
         elif self.device_type == "Radxa ZERO 3":
             self.i2c = I2C(self.i2c_addr, bus=3)
         elif self.device_type == "Khadas VIM4":

@@ -12,24 +12,25 @@
       mode_names:
       - DisplayInformationMode <!-- Enabled by display_information.service -->
       - DisplayQRcodeMode <!-- Enabled by display_information.service -->
-      - DisplayImageMode <!-- Enabled by display_information.service -->
-      - PairingMode <!-- Enabled by display_information.service -->
-      - DisplayBatteryGraphMode
+      <!-- - DisplayImageMode <!-\- Enabled by display_information.service -\-> -->
+      <!-- - PairingMode <!-\- Enabled by display_information.service -\-> -->
+      <!-- - DisplayBatteryGraphMode -->
       - ServoControlMode
+      - HandControlMode
       - PressureControlMode
       - TeachingMode
-      - SystemDebugMode
-      - FirmwareUpdateMode <!-- Enabled by display_information.service -->
-      - WiFiSettingsMode <!-- Enabled by display_information.service -->
-      - DataCollectionMode
+      <!-- - SystemDebugMode -->
+      <!-- - FirmwareUpdateMode <!-\- Enabled by display_information.service -\-> -->
+      <!-- - WiFiSettingsMode <!-\- Enabled by display_information.service -\-> -->
+      <!-- - DataCollectionMode -->
     </rosparam>
   </node>
 
-  <node name="display_battery_graph_mode"
-        pkg="riberry_startup" type="display_battery_graph_mode.py"
-        output="screen"
-        respawn="true">
-  </node>
+  <!-- <node name="display_battery_graph_mode" -->
+  <!--       pkg="riberry_startup" type="display_battery_graph_mode.py" -->
+  <!--       output="screen" -->
+  <!--       respawn="true"> -->
+  <!-- </node> -->
 
   <node name="servo_control_mode"
         pkg="riberry_startup" type="servo_control_mode.py"
@@ -49,20 +50,20 @@
         respawn="true" clear_params="true">
   </node>
 
-  <node name="data_collection_mode"
-        pkg="riberry_startup" type="data_collection_mode.py"
-        output="screen"
-        respawn="true" clear_params="true">
-    <rosparam param="topic_names">
-      - /joint_states
-      - /tf
-      - /tf_static
-      - /camera/color/camera_info
-      - /camera/color/image_raw/compressed
-      - /camera/depth/camera_info
-      - /camera/depth/image_rect_raw/compressedDepth
-      - /camera/extrinsics/depth_to_color
-    </rosparam>
-  </node>
+  <!-- <node name="data_collection_mode" -->
+  <!--       pkg="riberry_startup" type="data_collection_mode.py" -->
+  <!--       output="screen" -->
+  <!--       respawn="true" clear_params="true"> -->
+  <!--   <rosparam param="topic_names"> -->
+  <!--     - /joint_states -->
+  <!--     - /tf -->
+  <!--     - /tf_static -->
+  <!--     - /camera/color/camera_info -->
+  <!--     - /camera/color/image_raw/compressed -->
+  <!--     - /camera/depth/camera_info -->
+  <!--     - /camera/depth/image_rect_raw/compressedDepth -->
+  <!--     - /camera/extrinsics/depth_to_color -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
 </launch>

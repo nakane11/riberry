@@ -16,6 +16,7 @@ class ModeType(Enum):
     PAIRING = 0x11
     WIFI_SETTINGS = 0x12
     DATA_COLLECTION = 0x13
+    HAND_CONTROL = 0x14
 
     FIRMWARE_UPDATE_MODE = 0xFF
 
@@ -35,6 +36,7 @@ MODE_TYPE_MAPPING = {
     ModeType.PAIRING: "PairingMode",
     ModeType.WIFI_SETTINGS: "WiFiSettingsMode",
     ModeType.DATA_COLLECTION: "DataCollectionMode",
+    ModeType.HAND_CONTROL: "HandControlMode",
 
     ModeType.FIRMWARE_UPDATE_MODE: "FirmwareUpdateMode",
 }
