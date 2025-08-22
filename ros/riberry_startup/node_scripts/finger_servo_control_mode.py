@@ -50,7 +50,7 @@ class FingerServoControlMode(Mode):
         toggle servo control.
         """
         if self.mode == "FingerServoControlMode" and msg.data == 1:
-            self.target_finger_idx = (self.target_finger_idx + 1) % len(self.target_finger_idx)
+            self.target_finger_idx = (self.target_finger_idx + 1) % len(self.fingers)
 
         elif self.mode == "FingerServoControlMode" and msg.data == 2:
             rospy.loginfo(
