@@ -1,8 +1,9 @@
 <launch>
+  <include file="$(find riberry_startup)/launch/all_modes.launch" />
 
-  <arg name="namespace" default="robot_a" />
-
-  <group ns="$(arg namespace)" >
-  </group>
+  <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
+    <arg name="servo_config_path" value="$(find kxr_models)/config/hand.yaml" />
+    <arg name="publish_imu" value="false" />
+  </include>
 
 </launch>

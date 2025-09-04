@@ -55,8 +55,8 @@ inline String toString(Name name) {
             return "DataCollectionMode";
         case LEADER_FOLLOWER:
             return "LeaderFollowerMode";
-    case FINGER_SERVO_CONTROL:
-      return "FingerServoControlMode";
+        case FINGER_SERVO_CONTROL:
+            return "FingerServoControlMode";
         case FIRMWARE_UPDATE:
             return "FirmwareUpdateMode";
         default:

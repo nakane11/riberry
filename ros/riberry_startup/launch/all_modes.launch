@@ -18,7 +18,7 @@
       - ServoControlMode
       - FingerServoControlMode
       <!-- - PressureControlMode -->
-      <!-- - TeachingMode -->
+      - TeachingMode
       <!-- - SystemDebugMode -->
       <!-- - FirmwareUpdateMode <!-\- Enabled by display_information.service -\-> -->
       <!-- - WiFiSettingsMode <!-\- Enabled by display_information.service -\-> -->
@@ -51,11 +51,14 @@
   <!--       respawn="true"> -->
   <!-- </node> -->
 
-  <!-- <node name="teaching_mode" -->
-  <!--       pkg="riberry_startup" type="teaching_mode.py" -->
-  <!--       output="screen" -->
-  <!--       respawn="true" clear_params="true"> -->
-  <!-- </node> -->
+  <node name="teaching_mode"
+        pkg="riberry_startup" type="teaching_mode.py"
+        output="screen"
+        respawn="true" clear_params="true">
+    <rosparam>
+      speed: 6.0
+    </rosparam>
+  </node>
 
   <!-- <node name="data_collection_mode" -->
   <!--       pkg="riberry_startup" type="data_collection_mode.py" -->
