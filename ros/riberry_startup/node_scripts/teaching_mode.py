@@ -267,6 +267,7 @@ class TeachingMode(Mode):
             self.virtual_button_tap(2)  # Play the latest motion
             if self.wait_for_state(State.PLAY, 1) is False:
                 return SelectMotionResponse(success=False)
+            self.wait_for_state(State.WAIT, None)
         else:
             # Stop playing
             if self.wait_for_state(State.PLAY, 1) is False:
