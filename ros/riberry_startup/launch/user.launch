@@ -3,7 +3,27 @@
 
   <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
     <arg name="servo_config_path" value="$(find kxr_models)/config/hand.yaml" />
-    <arg name="publish_imu" value="false" />
+    <arg name="publish_imu" value="true" />
+    <arg name="temperature_limit" value="70" />
   </include>
+
+  <node name="eusmodel_server"
+      pkg="kxreus" type="eus_model_server.py"
+      output="screen" >
+  </node>
+
+  <node name="imu_orientation"
+      pkg="riberry_startup" type="imu_orientation.py"
+      output="screen" >
+    <remap from="~imu" to="/imu" />
+  </node>
+
+  <node name="adc_button"
+      pkg="riberry_startup" type="adc_button.py"
+      output="screen" >
+  </node>
+
+  <node name="button_control" pkg="handrobot_control" type="button-control.l"
+        output="screen" />
 
 </launch>

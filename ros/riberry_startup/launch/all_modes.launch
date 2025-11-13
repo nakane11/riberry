@@ -16,7 +16,6 @@
       <!-- - PairingMode <!-\- Enabled by display_information.service -\-> -->
       <!-- - DisplayBatteryGraphMode -->
       - ServoControlMode
-      - FingerServoControlMode
       <!-- - PressureControlMode -->
       - TeachingMode
       <!-- - SystemDebugMode -->
@@ -39,12 +38,6 @@
         respawn="true">
   </node>
 
-  <node name="finger_servo_control_mode"
-        pkg="riberry_startup" type="finger_servo_control_mode.py"
-        output="screen"
-        respawn="true">
-  </node>
-
   <!-- <node name="pressure_control_mode" -->
   <!--       pkg="riberry_startup" type="pressure_control_mode.py" -->
   <!--       output="screen" -->
@@ -56,7 +49,7 @@
         output="screen"
         respawn="true" clear_params="true">
     <rosparam>
-      speed: 6.0
+      speed: 2.0
     </rosparam>
   </node>
 
